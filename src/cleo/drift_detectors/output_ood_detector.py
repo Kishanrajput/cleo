@@ -1,6 +1,6 @@
 import numpy as np
 
-from fel_cl.novelty import fit_novelty_reference, novelty_score
+from cleo.novelty import fit_novelty_reference, novelty_score
 
 from .base import BaseDriftDetector
 from .adwin_detector import AdwinDriftDetector

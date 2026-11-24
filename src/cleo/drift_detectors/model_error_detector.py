@@ -1,6 +1,6 @@
 import numpy as np
 
-from fel_cl.signal import rolling_mean
+from cleo.signal import rolling_mean
 
 from .base import BaseDriftDetector
 from .threshold_detector import ThresholdDriftDetector

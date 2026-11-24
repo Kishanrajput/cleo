@@ -1,5 +1,5 @@
 from .base import BaseDriftDetector
-from fel_cl.registry import register, make, spec, list_registered_modules
+from cleo.registry import register, make, spec, list_registered_modules
 
 # Low-level primitives -- raw-signal-in, index-out. Not meant to be composed
 # directly into a CombinedDriftDetector (see their docstrings); the named

@@ -1,7 +1,7 @@
 import numpy as np
 from river.drift import ADWIN
 
-from fel_cl.signal import rolling_mean
+from cleo.signal import rolling_mean
 
 from .base import BaseDriftDetector
 
