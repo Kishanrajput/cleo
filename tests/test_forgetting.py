@@ -31,3 +31,13 @@ def test_forgetting_metrics_lower_is_better():
 def test_forgetting_metrics_single_task():
     out = forgetting_metrics(np.array([[0.2]]))
     assert out["average_forgetting"] is None and out["backward_transfer"] is None
+
+
+def test_plot_forgetting_heatmap_writes_a_file_for_a_lower_triangular_matrix(tmp_path):
+    import matplotlib
+    matplotlib.use("Agg")
+    from fel_cl.forgetting import plot_forgetting_heatmap
+
+    nan = np.nan
+    plot_forgetting_heatmap(np.array([[0.02, nan, nan], [0.03, 0.01, nan], [0.05, 0.02, 0.015]]), str(tmp_path))
+    assert (tmp_path / "forgetting_heatmap.png").exists()

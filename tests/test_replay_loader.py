@@ -18,3 +18,9 @@ def test_make_replay_loader_plain_and_weighted():
 
 def test_replay_buffer_importable_from_package_root():
     assert len(ReplayBuffer()) == 0
+
+
+def test_task_inverse_weights_balances_unequal_task_sizes():
+    w = task_inverse_weights(np.array([0] * 900 + [1] * 100))
+    assert np.allclose(w[:900], 1.0 / 900) and np.allclose(w[900:], 1.0 / 100)
+    assert np.isclose(w[:900].sum(), w[900:].sum())
