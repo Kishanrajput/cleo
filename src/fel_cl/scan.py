@@ -68,8 +68,13 @@ def scan_stream(
             predictions=cat(all_preds), std=cat(all_std),
         )
 
-    for chunk_id, inputs, targets, timestamps in chunks:
+    chunk_iter = iter(chunks)
+    while True:
         if max_chunks is not None and chunks_scanned >= max_chunks:
+            break
+        try:
+            chunk_id, inputs, targets, timestamps = next(chunk_iter)
+        except StopIteration:
             break
 
         reached_stop = False
