@@ -1,6 +1,6 @@
 import numpy as np
 
-from cleo.novelty import fit_novelty_reference, novelty_score
+from l3kit.novelty import fit_novelty_reference, novelty_score
 
 
 def test_fit_novelty_reference_recovers_mean_and_std():

@@ -1,12 +1,12 @@
-# cleo
+# l3kit
 
-**C**ontinual **LE**arning t**O**olkit — generic, model-agnostic continual-learning building blocks (PyTorch / Lightning). No dependency on any particular dataset or experiment framework.
+**L3** (Life-**L**ong **L**earning) **Kit** — generic, model-agnostic continual-learning building blocks (PyTorch / Lightning). No dependency on any particular dataset or experiment framework.
 
-- `cleo.replay`: `ReplayBuffer` (quantile-stratified, growing), `task_inverse_weights`, `make_replay_loader`
-- `cleo.regularizer`, `cleo.ewc`, `cleo.synaptic_intelligence`: quadratic-penalty regularizer, EWC Fisher importance, SI tracker (Lightning callback)
-- `cleo.drift_detectors`: threshold, ADWIN, model-error, model-uncertainty, input/output OOD, debounced and combined detectors, plus `build_single_detector` / `build_combined_detector`
-- `cleo.forgetting`: `evaluate_on_past_tasks` (injected metric), `forgetting_metrics`, `plot_forgetting_heatmap`
-- `cleo.scan`: `scan_stream`, a data-agnostic "feed chunks to a detector until it fires" loop
+- `l3kit.replay`: `ReplayBuffer` (quantile-stratified, growing), `task_inverse_weights`, `make_replay_loader`
+- `l3kit.regularizer`, `l3kit.ewc`, `l3kit.synaptic_intelligence`: quadratic-penalty regularizer, EWC Fisher importance, SI tracker (Lightning callback)
+- `l3kit.drift_detectors`: threshold, ADWIN, model-error, model-uncertainty, input/output OOD, debounced and combined detectors, plus `build_single_detector` / `build_combined_detector`
+- `l3kit.forgetting`: `evaluate_on_past_tasks` (injected metric), `forgetting_metrics`, `plot_forgetting_heatmap`
+- `l3kit.scan`: `scan_stream`, a data-agnostic "feed chunks to a detector until it fires" loop
 
 ## Install / test
 
@@ -14,4 +14,4 @@
 uv venv && uv pip install -e ".[dev]"
 pytest
 ```
-`pip install cleo[plots]` adds matplotlib for the heatmap.
+`pip install l3kit[plots]` adds matplotlib for the heatmap.

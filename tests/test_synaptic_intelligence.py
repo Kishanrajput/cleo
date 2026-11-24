@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
-from cleo.regularizer import QuadraticPenaltyRegularizer
-from cleo.synaptic_intelligence import SIWeightTracker
+from l3kit.regularizer import QuadraticPenaltyRegularizer
+from l3kit.synaptic_intelligence import SIWeightTracker
 
 
 class _ToyModule(L.LightningModule):

@@ -1,7 +1,7 @@
 import importlib
 import logging
 
-_log = logging.getLogger("cleo Registry")
+_log = logging.getLogger("l3kit Registry")
 
 
 def load(name: str):

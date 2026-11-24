@@ -1,6 +1,6 @@
 import numpy as np
 
-from cleo import ReplayBuffer, make_replay_loader, task_inverse_weights
+from l3kit import ReplayBuffer, make_replay_loader, task_inverse_weights
 
 
 def test_task_inverse_weights_balance_tasks():

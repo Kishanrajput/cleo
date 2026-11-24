@@ -1,4 +1,4 @@
-from cleo.novelty import fit_novelty_reference, novelty_score
+from l3kit.novelty import fit_novelty_reference, novelty_score
 
 from .base import BaseDriftDetector
 from .adwin_detector import AdwinDriftDetector

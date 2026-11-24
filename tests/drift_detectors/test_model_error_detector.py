@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from cleo.drift_detectors.model_error_detector import ModelErrorDriftDetector
+from l3kit.drift_detectors.model_error_detector import ModelErrorDriftDetector
 
 
 class _ZeroPredModel:

@@ -1,4 +1,4 @@
-"""cleo: generic, model-agnostic continual-learning building blocks.
+"""l3kit: generic, model-agnostic continual-learning building blocks.
 
 Replay buffers, quadratic-penalty regularizers (EWC, Synaptic Intelligence),
 drift detectors, forgetting metrics and a data-agnostic stream scanner. No

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from cleo import DriftNotFoundError, scan_stream
-from cleo.drift_detectors import build_combined_detector
+from l3kit import DriftNotFoundError, scan_stream
+from l3kit.drift_detectors import build_combined_detector
 
 
 class _SignalDetector:

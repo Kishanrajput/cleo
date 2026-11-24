@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from cleo.ewc import compute_fisher_importance
+from l3kit.ewc import compute_fisher_importance
 
 
 class _ToyModule(L.LightningModule):

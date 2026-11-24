@@ -1,4 +1,4 @@
-from cleo.drift_detectors.debounced_detector import DebouncedDriftDetector
+from l3kit.drift_detectors.debounced_detector import DebouncedDriftDetector
 
 
 class _ScriptedDetector:

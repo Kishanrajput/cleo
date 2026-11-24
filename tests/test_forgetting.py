@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from cleo import evaluate_on_past_tasks, forgetting_metrics
+from l3kit import evaluate_on_past_tasks, forgetting_metrics
 
 
 def test_evaluate_on_past_tasks_skips_current_cycle_and_uses_injected_metric():
@@ -36,7 +36,7 @@ def test_forgetting_metrics_single_task():
 def test_plot_forgetting_heatmap_writes_a_file_for_a_lower_triangular_matrix(tmp_path):
     import matplotlib
     matplotlib.use("Agg")
-    from cleo.forgetting import plot_forgetting_heatmap
+    from l3kit.forgetting import plot_forgetting_heatmap
 
     nan = np.nan
     plot_forgetting_heatmap(np.array([[0.02, nan, nan], [0.03, 0.01, nan], [0.05, 0.02, 0.015]]), str(tmp_path))
