@@ -27,66 +27,138 @@ class ReplayBuffer:
         self._task_targets = []
         self._task_ids = []
 
-    def add_task(self, inputs, targets, scores, task_id=None, regime_boundaries=None):
+    def add_task(
+        self, inputs, targets, scores, task_id=None, regime_boundaries=None, context_cols=None, context_bins=4,
+    ):
         """Select representative rows from this task and add them to the
         buffer. `scores` (e.g. per-sample absolute error) determines the
         quantile bins; `task_id` defaults to how many tasks have been added
         so far (0-indexed).
 
+        This task's rows can optionally be split into groups before
+        stratifying -- EITHER chronologically via `regime_boundaries` OR by
+        one or more context variables' own values via `context_cols`/
+        `context_bins`, never both (raises ValueError if both are given).
+        With neither (the common case), this reduces to plain whole-task
+        quantile stratification, same as before either param existed. With
+        groups, the total `n_bins * samples_per_bin` budget is split across
+        groups proportional to each group's share of this task's rows, and
+        each group is independently quantile-stratified over its own
+        `n_bins` bins (scaled down to its quota) -- so one task still
+        contributes ~n_bins*samples_per_bin rows total, drawn from every
+        group it actually contains.
+
         regime_boundaries: sorted row indices (into `inputs`/`targets`/
         `scores`, 0-based, NOT including 0) where this task's data switches
-        to a different internally-detected regime (see
+        to a different internally-detected (chronological) regime (see
         RegimeAwareTrainValSplitPreprocessor's `train_regime_boundaries`
         return value -- pass that here, not the original window-level
         `regime_boundaries`, since this task's rows are the train split
-        only). None or [] (the common case, one regime) reduces to plain
-        whole-task quantile stratification, same as before this param
-        existed. With multiple regimes, the total `n_bins * samples_per_bin`
-        budget is split across regimes proportional to each regime's share
-        of this task's rows, and each regime is independently
-        quantile-stratified over its own `n_bins` bins (scaled down to its
-        quota) -- so one task still contributes ~n_bins*samples_per_bin rows
-        total, drawn from every regime it actually contains rather than only
-        the chronologically-last one."""
+        only). Produces CONTIGUOUS groups.
+
+        context_cols: column indices into `inputs` (0-based) of one or more
+        "context" variables (e.g. a beam-configuration PV) whose own values
+        -- not `scores` -- should additionally stratify sampling, so every
+        quantile-bin of score is represented from every context-value
+        regime, not just whichever context value happens to dominate this
+        task's rows. Each column is independently quantile-binned into
+        `context_bins` bins (same edge convention `_select_indices` uses for
+        `scores`); with more than one column, rows are grouped by the JOINT
+        combination of each column's own bin (collapses to a single
+        column's own bins when only one is given). Produces generally
+        NON-contiguous groups. `context_bins` is ignored when `context_cols`
+        is None."""
         if task_id is None:
             task_id = len(self._task_inputs)
         inputs = np.asarray(inputs)
         targets = np.asarray(targets)
         scores = np.asarray(scores)
-        total_quota = self.n_bins * self.samples_per_bin
 
-        boundaries = sorted(regime_boundaries or [])
-        edges = [0] + boundaries + [len(scores)]
-        selected = []
-        for start, end in zip(edges[:-1], edges[1:]):
-            if start >= end:
-                continue
-            quota = round(total_quota * (end - start) / len(scores))
-            regime_indices = self._select_indices(scores[start:end], quota)
-            selected.extend((regime_indices + start).tolist())
+        if regime_boundaries and context_cols:
+            raise ValueError(
+                "add_task accepts regime_boundaries or context_cols, not both -- chronological "
+                "regime splitting and context-variable grouping are mutually exclusive per call"
+            )
 
-        indices = np.array(selected, dtype=int)
+        if context_cols:
+            groups = self._context_groups(inputs, context_cols, context_bins)
+        else:
+            boundaries = sorted(regime_boundaries or [])
+            edges = [0] + boundaries + [len(scores)]
+            groups = [np.arange(start, end) for start, end in zip(edges[:-1], edges[1:]) if start < end]
+
+        indices = self._select_grouped_indices(scores, groups)
         self._task_inputs.append(inputs[indices])
         self._task_targets.append(targets[indices])
         self._task_ids.append(np.full(len(indices), task_id))
+
+    def _select_grouped_indices(self, scores, groups):
+        """Shared by every add_task grouping path (none/regime/context):
+        split the total n_bins*samples_per_bin quota across `groups`
+        (arbitrary, possibly non-contiguous row-index arrays) proportional
+        to each group's share of `scores`' rows, independently
+        quantile-stratify each group via _select_indices, and remap each
+        group's locally selected indices back to row indices into the
+        original arrays."""
+        total_quota = self.n_bins * self.samples_per_bin
+        n = len(scores)
+        selected = []
+        for group_idx in groups:
+            quota = round(total_quota * len(group_idx) / n)
+            local_indices = self._select_indices(scores[group_idx], quota)
+            selected.extend(group_idx[local_indices].tolist())
+        return np.array(selected, dtype=int)
+
+    def _context_groups(self, inputs, context_cols, context_bins):
+        """Non-contiguous row groups for context-variable-based replay
+        stratification: every one of the given `inputs` columns (0-based
+        indices) is independently quantile-binned into `context_bins` bins
+        (same edge convention as _select_indices, via _quantile_bin_index);
+        rows are then grouped by the JOINT combination of each column's own
+        bin id. A single context_cols entry collapses to that column's own
+        quantile bins; several combine jointly (via np.unique over the
+        stacked per-column bin ids), which only ever produces combinations
+        that at least one row actually falls into -- never an empty
+        cross-product cell."""
+        context_values = np.asarray(inputs)[:, context_cols]
+        per_col_bins = np.stack(
+            [self._quantile_bin_index(context_values[:, c], context_bins) for c in range(context_values.shape[1])],
+            axis=1,
+        )
+        _, group_ids = np.unique(per_col_bins, axis=0, return_inverse=True)
+        group_ids = group_ids.reshape(-1)  # defensive: shape with axis= has varied across NumPy versions
+        return [np.where(group_ids == g)[0] for g in range(group_ids.max() + 1)]
+
+    def _quantile_bin_index(self, values, n_bins):
+        """Per-row integer bin id (0..n_bins-1) from quantile-binning
+        `values` into n_bins bins: first bin is [edges[0], edges[1]]
+        inclusive on both ends, every later bin is (edges[j], edges[j+1]]
+        -- shared by _select_indices (bins by score) and _context_groups
+        (bins by a context variable's own value) so both use the identical
+        convention."""
+        edges = np.quantile(values, np.linspace(0.0, 1.0, n_bins + 1))
+        bin_idx = np.full(len(values), -1, dtype=int)
+        for j in range(n_bins):
+            if j == 0:
+                mask = (values >= edges[0]) & (values <= edges[1])
+            else:
+                mask = (values > edges[j]) & (values <= edges[j + 1])
+            bin_idx[mask] = j
+        return bin_idx
 
     def _select_indices(self, scores, quota):
         """Quantile-stratify `scores` into self.n_bins bins and draw up to
         `quota` rows total (samples/bin = round(quota / n_bins), each bin
         still capped at its own size) -- quota is n_bins*samples_per_bin for
-        a single-regime task, or a regime's proportional share of that when
-        called per-regime from add_task."""
+        a single-regime task, or a group's proportional share of that when
+        called per-group from add_task."""
         if len(scores) == 0 or quota <= 0:
             return np.array([], dtype=int)
         samples_per_bin = max(1, round(quota / self.n_bins))
-        edges = np.quantile(scores, np.linspace(0.0, 1.0, self.n_bins + 1))
+        bin_idx = self._quantile_bin_index(scores, self.n_bins)
         selected = []
         for j in range(self.n_bins):
-            if j == 0:
-                bin_mask = (scores >= edges[0]) & (scores <= edges[1])
-            else:
-                bin_mask = (scores > edges[j]) & (scores <= edges[j + 1])
-            bin_indices = np.where(bin_mask)[0]
+            bin_indices = np.where(bin_idx == j)[0]
             if len(bin_indices) == 0:
                 continue
             k = min(samples_per_bin, len(bin_indices))
