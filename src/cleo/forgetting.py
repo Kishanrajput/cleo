@@ -50,7 +50,7 @@ def plot_forgetting_heatmap(forgetting_matrix, output_dir, metric_name="MAE"):
     """matrix[i, j] = metric of the model as it stood right after adaptation i,
     evaluated on task j's validation data (NaN where j hadn't been created yet).
     Row 0 is the base model. Writes forgetting_heatmap.png. Requires
-    matplotlib (install `fel-cl[plots]`)."""
+    matplotlib (install `cleo[plots]`)."""
     import os
 
     import matplotlib.pyplot as plt

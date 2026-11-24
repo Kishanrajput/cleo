@@ -1,7 +1,7 @@
 import importlib
 import logging
 
-_log = logging.getLogger("fel_cl Registry")
+_log = logging.getLogger("cleo Registry")
 
 
 def load(name: str):
