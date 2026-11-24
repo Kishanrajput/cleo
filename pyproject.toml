@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fel-cl"
+version = "0.1.0"
+description = "Generic continual-learning building blocks: replay, EWC/SI regularizers, drift detectors, forgetting metrics."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.20", "pandas>=1.5", "torch>=2.0", "lightning>=2.0", "river>=0.21"]
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.5"]
+dev = ["pytest>=7", "pytest-cov", "matplotlib>=3.5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
