@@ -1,6 +1,6 @@
 import numpy as np
 
-from fel_cl.signal import rolling_mean
+from cleo.signal import rolling_mean
 
 
 def test_rolling_mean_leading_nan_for_incomplete_windows():

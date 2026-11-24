@@ -1,4 +1,4 @@
-from fel_cl.drift_detectors.combined_detector import CombinedDriftDetector
+from cleo.drift_detectors.combined_detector import CombinedDriftDetector
 
 
 class _FixedIndexDetector:

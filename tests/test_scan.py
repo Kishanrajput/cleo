@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from fel_cl import DriftNotFoundError, scan_stream
-from fel_cl.drift_detectors import build_combined_detector
+from cleo import DriftNotFoundError, scan_stream
+from cleo.drift_detectors import build_combined_detector
 
 
 class _SignalDetector:

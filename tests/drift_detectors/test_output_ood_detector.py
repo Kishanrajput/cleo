@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from fel_cl.drift_detectors.output_ood_detector import OutputOODDriftDetector
+from cleo.drift_detectors.output_ood_detector import OutputOODDriftDetector
 
 
 def test_fit_requires_train_targets():

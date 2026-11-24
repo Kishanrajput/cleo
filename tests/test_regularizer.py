@@ -2,7 +2,7 @@ import lightning as L
 import torch
 import torch.nn as nn
 
-from fel_cl.regularizer import QuadraticPenaltyRegularizer
+from cleo.regularizer import QuadraticPenaltyRegularizer
 
 
 class _ToyModule(L.LightningModule):

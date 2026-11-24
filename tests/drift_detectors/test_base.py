@@ -1,6 +1,6 @@
 import pytest
 
-from fel_cl.drift_detectors.base import BaseDriftDetector
+from cleo.drift_detectors.base import BaseDriftDetector
 
 
 def test_base_drift_detector_cannot_be_instantiated_directly():

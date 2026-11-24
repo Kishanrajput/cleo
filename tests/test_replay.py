@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from fel_cl.replay import ReplayBuffer
+from cleo.replay import ReplayBuffer
 
 
 def test_add_task_selects_up_to_n_bins_times_samples_per_bin():

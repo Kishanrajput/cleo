@@ -1,4 +1,4 @@
-from fel_cl.drift_detectors import CombinedDriftDetector, DebouncedDriftDetector, build_combined_detector, build_single_detector
+from cleo.drift_detectors import CombinedDriftDetector, DebouncedDriftDetector, build_combined_detector, build_single_detector
 
 
 def test_single_detector_debounced_only_for_ood_ids():

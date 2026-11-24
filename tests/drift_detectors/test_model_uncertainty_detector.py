@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from fel_cl.drift_detectors.model_uncertainty_detector import ModelUncertaintyDriftDetector
+from cleo.drift_detectors.model_uncertainty_detector import ModelUncertaintyDriftDetector
 
 
 class _StdByRowFakeModel:

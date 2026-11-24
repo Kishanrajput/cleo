@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from fel_cl.drift_detectors.threshold_detector import ThresholdDriftDetector
+from cleo.drift_detectors.threshold_detector import ThresholdDriftDetector
 
 
 def test_fit_is_125_percent_of_max_rolling_mean_over_the_reference_signal():

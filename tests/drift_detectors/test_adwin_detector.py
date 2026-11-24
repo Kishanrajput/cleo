@@ -1,6 +1,6 @@
 import numpy as np
 
-from fel_cl.drift_detectors.adwin_detector import AdwinDriftDetector
+from cleo.drift_detectors.adwin_detector import AdwinDriftDetector
 
 
 def test_run_returns_index_of_first_signal_on_a_sustained_shift():

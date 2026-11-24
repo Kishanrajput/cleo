@@ -1,4 +1,4 @@
-from fel_cl.drift_detectors import list_registered_modules, spec
+from cleo.drift_detectors import list_registered_modules, spec
 
 
 def test_threshold_detector_registered():
